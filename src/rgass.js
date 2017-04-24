@@ -80,8 +80,59 @@ class Model {
     return targetNode
   }
 
+  deleteWholeNode (targetNode) {
+    targetNode.data.visible = 0
+    return targetNode.data.key
+  }
+
+  deletePriorNode (targetNode, delLength) {
+    let fNode, lNode
+    [fNode, lNode] = this.splitTwoNode(targetNode, targetNode.data.key.length - delLength)
+    fNode.data.visible = 0
+    return [fNode.data.key, lNode.data.key]
+  }
+
+  deleteLastNode (targetNode, delLength) {
+    let fNode, lNode
+    [fNode, lNode] = this.splitTwoNode(targetNode, targetNode.data.key.length - delLength)
+    lNode.data.visible = 0
+    return [fNode.data.key, lNode.data.key]
+  }
+
+  deleteMiddleNode () {
+
+  }
+
+  deleteMultipleNode () {
+
+  }
+
   localDelete (targetKey, position, delLength, key) {
-    // noop
+    let targetNode = targetKey && this.hashTable[hashKey(targetKey)]
+    let length = targetNode.data.key.length
+    let keyList = []
+
+    if (position === 1 && delLength === length) {
+      keyList.push(this.deleteWholeNode(targetNode))
+    } else if (position === 1 && delLength < length) {
+      keyList.push(this.deletePriorNode(targetNode))
+    }
+
+    if (position > 1 && position + delLength === length) {
+      keyList.push(this.deleteLastNode(targetNode, position - 1))
+    }
+
+    if (position > 1 && position + delLength - 1 < length) {
+      keyList.push(this.deleteMiddleNode(targetNode, position, delLength))
+    }
+
+    if (position > 1 && position + delLength - 1 > length) {
+      keyList.push(this.deleteMutipleNode(targetNode, position, delLength))
+    }
+
+    this.broadcast({type: 'delete', position: position, delLength: delLength, keyList: keyList, key: key})
+
+    return this.lModel
   }
 
   localInsert (targetKey, position, str, key) {
