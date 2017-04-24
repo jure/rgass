@@ -1,4 +1,4 @@
-const Rgass = require('../index.js')
+const Rgass = require('../rgass.js')
 
 describe('initial model', () => {
   let model = new Rgass.Model()

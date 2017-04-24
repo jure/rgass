@@ -296,7 +296,7 @@ class Model {
       }
     } else {
       let previous = this.lModel.head
-      let current = this.lModel.head.next
+      let current = this.lModel.head && this.lModel.head.next
       while (current) {
         if (key === this.predecessorId(key, current.data.key)) {
           previous = current
@@ -17567,14 +17567,18 @@ class DoublyLinkedList {
     return this.numberOfValues
   }
 
-  print () {
+  toString () {
     let string = ''
     let current = this.head
     while (current) {
       string += `${current.data} `
       current = current.next
     }
-    console.log(string.trim())
+    return string.trim()
+  }
+
+  print () {
+    console.log(this.toString())
   }
 
   nodes () {

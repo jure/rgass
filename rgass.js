@@ -9,7 +9,7 @@ class Model {
     this.hashTable = options.hashTable || {}
     this.lModel = options.lModel || new DoublyLinkedList()
 
-    this.broadcast = options.broadcast
+    this.broadcast = options.broadcast || (() => {})
 
     if (!options.siteId) {
       throw Error('missing siteId')
@@ -224,7 +224,7 @@ class Model {
       }
     } else {
       let previous = this.lModel.head
-      let current = this.lModel.head.next
+      let current = this.lModel.head && this.lModel.head.next
       while (current) {
         if (key === this.predecessorId(key, current.data.key)) {
           previous = current
@@ -253,7 +253,7 @@ class View {
     var currentNode
     var positionWithinNode = 0
     this.lView.traverse(node => {
-      if (currentPosition <= position) {
+      if (currentPosition < position) {
         positionWithinNode = position - currentPosition
         currentPosition = currentPosition + node.data.key.length
         currentNode = node
