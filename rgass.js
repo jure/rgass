@@ -4,6 +4,10 @@ const Node = require('./src/doubly-linked-list.js').Node
 const VectorClock = require('./src/vector-clock')
 const _ = require('lodash')
 
+function hashKey (key) {
+  return JSON.stringify(key)
+}
+
 class Model {
   constructor (options) {
     this.hashTable = options.hashTable || {}
@@ -61,7 +65,7 @@ class Model {
       return
     }
 
-    let targetNode = this.hashTable[targetKey]
+    let targetNode = this.hashTable[hashKey(targetKey)]
 
     while (targetNode.data.flag === 1) {
       if (position <= targetNode.data.list[0].data.key.length) {
@@ -83,30 +87,26 @@ class Model {
   localInsert (targetKey, position, str, key) {
     let newNode = new Node({key: key, str: str, visible: 1})
 
-    // Is this the first node that this client is aware of?
-    if (!targetKey) {
-      this.lModel.add(newNode.data)
+    let targetNode = targetKey && this.hashTable[hashKey(targetKey)]
+    console.log('Found targetNode', targetNode)
+
+    if (!targetNode && position === 0) {
+      this.lModel.addToHead(newNode.data)
     } else {
-      let targetNode = this.hashTable[targetKey]
-      console.log('Found targetNode', targetNode)
-      if ((targetNode === this.lModel.head) && position === 0) {
-        this.lModel.insertBefore(newNode.data, targetNode.data)
+      if (position === targetNode.data.key.length) {
+        this.lModel.insertAfter(newNode.data, targetNode.data)
       } else {
-        if (position === targetNode.data.key.length) {
-          this.lModel.insertAfter(newNode.data, targetNode.data)
-        } else {
-          let fNode, lNode
-          [fNode, lNode] = this.splitTwoNode(targetNode, position)
-          this.lModel.insertBefore(targetNode, fNode)
-          this.lModel.insertAfter(newNode, fNode)
-          this.lModel.insertAfter(lNode, newNode)
-          this.hashTable[fNode.data.key] = fNode
-          this.hashTable[lNode.data.key] = lNode
-        }
+        let fNode, lNode
+        [fNode, lNode] = this.splitTwoNode(targetNode, position)
+        this.lModel.insertBefore(targetNode, fNode)
+        this.lModel.insertAfter(newNode, fNode)
+        this.lModel.insertAfter(lNode, newNode)
+        this.hashTable[fNode.data.key] = fNode
+        this.hashTable[lNode.data.key] = lNode
       }
     }
 
-    this.hashTable[key] = newNode
+    this.hashTable[hashKey(key)] = newNode
 
     console.log('debug', this.lModel)
     this.broadcast([{type: 'insert', position: position, targetKey: targetKey, str: str, key: key}])
@@ -203,10 +203,6 @@ class Model {
     let newNode = new Node({key: key, str: str, visible: 1})
     let targetNode = this.findNode(targetKey, position)
 
-    // if (!targetKey) {
-    //   this.lModel.add(newNode.data)
-    // } else {
-
     if (targetNode) {
       if (position === targetNode.data.key.length) {
         while (targetNode && (key === this.predecessorId(key, targetNode.data.key))) {
@@ -219,26 +215,30 @@ class Model {
         this.lModel.insertBefore(targetNode.data, fNode.data)
         this.lModel.insertAfter(newNode.data, fNode.data)
         this.lModel.insertAfter(lNode.data, newNode.data)
-        this.hashTable[fNode.data.key] = fNode
-        this.hashTable[lNode.data.key] = lNode
+        this.hashTable[hashKey(fNode.data.key)] = fNode
+        this.hashTable[hashKey(lNode.data.key)] = lNode
       }
     } else {
-      let previous = this.lModel.head
-      let current = this.lModel.head && this.lModel.head.next
+      let previous
+      let current = this.lModel.head
+
       while (current) {
         if (key === this.predecessorId(key, current.data.key)) {
           previous = current
           current = current.next
+        } else {
+          current = undefined
         }
       }
+
       if (previous) {
         this.lModel.insertAfter(newNode.data, previous.data)
       } else {
-        this.lModel.add(newNode.data)
+        this.lModel.addToHead(newNode.data)
       }
     }
 
-    this.hashTable[newNode.data.key] = newNode
+    this.hashTable[hashKey(newNode.data.key)] = newNode
     return this.lModel
   }
 }
