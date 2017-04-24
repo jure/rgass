@@ -25,6 +25,14 @@ class DoublyLinkedList {
     this.numberOfValues++
   }
 
+  addToHead (data) {
+    if (!this.head) {
+      this.add(data)
+    } else {
+      this.insertBefore(data, this.head.data)
+    }
+  }
+
   remove (data) {
     let current = this.head
     while (current) {

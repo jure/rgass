@@ -79,4 +79,16 @@ describe('linked list behaviour', () => {
 
     expect(doublyLinkedList.length()).toEqual(7)
   })
+
+  it('can add to head', () => {
+    const doublyLinkedList = new LinkedList()
+
+    // Can add if there is no head
+    doublyLinkedList.addToHead('world')
+    expect(doublyLinkedList.toString()).toEqual('world')
+
+    // Can add if there is a head
+    doublyLinkedList.addToHead('hello')
+    expect(doublyLinkedList.toString()).toEqual('hello world')
+  })
 })
