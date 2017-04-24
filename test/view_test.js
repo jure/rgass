@@ -1,5 +1,5 @@
-const View = require('../rgass').View
-const Model = require('../rgass').Model
+const View = require('../src/rgass').View
+const Model = require('../src/rgass').Model
 
 describe('View', () => {
   it('finds the right node', () => {

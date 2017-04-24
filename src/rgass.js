@@ -1,7 +1,7 @@
-const DoublyLinkedList = require('./src/doubly-linked-list.js').List
-const Node = require('./src/doubly-linked-list.js').Node
+const DoublyLinkedList = require('./doubly-linked-list.js').List
+const Node = require('./doubly-linked-list.js').Node
 
-const VectorClock = require('./src/vector-clock')
+const VectorClock = require('./vector-clock')
 const _ = require('lodash')
 
 function hashKey (key) {
@@ -98,11 +98,12 @@ class Model {
       } else {
         let fNode, lNode
         [fNode, lNode] = this.splitTwoNode(targetNode, position)
-        this.lModel.insertBefore(targetNode, fNode)
-        this.lModel.insertAfter(newNode, fNode)
-        this.lModel.insertAfter(lNode, newNode)
-        this.hashTable[fNode.data.key] = fNode
-        this.hashTable[lNode.data.key] = lNode
+        this.lModel.insertBefore(fNode.data, targetNode.data)
+        this.lModel.insertAfter(newNode.data, fNode.data)
+        this.lModel.insertAfter(lNode.data, newNode.data)
+        this.lModel.remove(targetNode.data)
+        this.hashTable[hashKey(fNode.data.key)] = fNode
+        this.hashTable[hashKey(lNode.data.key)] = lNode
       }
     }
 
@@ -119,12 +120,15 @@ class Model {
     fNode.data.key.offset = targetNode.data.key.offset
     fNode.data.key.length = position
     fNode.data.str = targetNode.data.str.substr(0, position)
+    console.log('created fNode', fNode)
 
     let lNode = _.cloneDeep(targetNode)
     lNode.data.key.offset = targetNode.data.key.offset + position
     lNode.data.str = targetNode.data.str.substr(position, targetNode.data.key.length - fNode.data.key.length)
-    targetNode.flag = 1
-    targetNode.list = [fNode, lNode]
+    console.log('created lNode', lNode)
+
+    targetNode.data.flag = 1
+    targetNode.data.list = [fNode, lNode]
     return [fNode, lNode]
   }
 
@@ -212,9 +216,10 @@ class Model {
       } else {
         let fNode, lNode
         [fNode, lNode] = this.splitTwoNode(targetNode, position)
-        this.lModel.insertBefore(targetNode.data, fNode.data)
+        this.lModel.insertBefore(fNode.data, targetNode.data)
         this.lModel.insertAfter(newNode.data, fNode.data)
         this.lModel.insertAfter(lNode.data, newNode.data)
+        this.lModel.remove(targetNode.data)
         this.hashTable[hashKey(fNode.data.key)] = fNode
         this.hashTable[hashKey(lNode.data.key)] = lNode
       }
