@@ -179,5 +179,60 @@ describe('Model', () => {
 
       expect(view.toString()).toEqual('RGBASS')
     })
+
+    it('sets the new split nodes length correctly', () => {
+      let ops = [
+        {
+          'type': 'insert',
+          'position': 0,
+          'str': 'RGASS',
+          'key': {
+            'session': 1,
+            'ssv': 1,
+            'site': 1,
+            'offset': 0,
+            'length': 5
+          }
+        },
+        {
+          'type': 'insert',
+          'position': 2,
+          'targetKey': {
+            'session': 1,
+            'ssv': 1,
+            'site': 1,
+            'offset': 0,
+            'length': 5
+          },
+          'str': 'b',
+          'key': {
+            'session': 1,
+            'ssv': 2,
+            'site': 1,
+            'offset': 2,
+            'length': 1
+          }
+        }
+      ]
+
+      let model = new Model({
+        siteId: 1,
+        session: 1
+      })
+
+      model.applyOperations(ops)
+
+      let view = new View()
+      view.synchronize(model)
+
+      let expectedLengths = [2, 1, 3]
+      let nodeNumber = 0
+      model.lModel.traverse(node => {
+        expect(node.data.key.length).toEqual(expectedLengths[nodeNumber])
+        nodeNumber++
+      })
+
+      expect(view.toString()).toEqual('RGbASS')
+    })
   })
 })

@@ -124,6 +124,7 @@ class Model {
 
     let lNode = _.cloneDeep(targetNode)
     lNode.data.key.offset = targetNode.data.key.offset + position
+    lNode.data.key.length = targetNode.data.key.length - position
     lNode.data.str = targetNode.data.str.substr(position, targetNode.data.key.length - fNode.data.key.length)
     console.log('created lNode', lNode)
 
