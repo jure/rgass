@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for doubly-linked-list.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="index.html">All files</a> doubly-linked-list.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">71.08% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>59/83</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>18/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">53.33% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>8/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">71.08% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>59/83</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">53x</span>
+<span class="cline-any cline-yes">53x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Adapted from github.com/benoitvallon/computer-science-in-javascript/blob/master/data-structures-in-javascript
+// Added support for object based data
+// Added serialization support to and from JSON
+&nbsp;
+const _ = require('lodash')
+const Node = require('./node')
+&nbsp;
+class DoublyLinkedList {
+  constructor () {
+    this.head = null
+    this.tail = null
+    this.numberOfValues = 0
+  }
+&nbsp;
+  add (data) {
+    const node = new Node(data)
+    if (!this.head) {
+      this.head = node
+      this.tail = node
+    } else {
+      node.previous = this.tail
+      this.tail.next = node
+      this.tail = node
+    }
+    this.numberOfValues++
+  }
+&nbsp;
+  remove (data) {
+    let current = this.head
+    while (current) {
+      if (_.isEqual(current.data, data)) {
+        if (current === this.head &amp;&amp; current === this.tail) {
+          this.head = null
+          this.tail = null
+        } else if (current === this.head) {
+          this.head = this.head.next
+          this.head.previous = null
+        } else if (current === this.tail) {
+          this.tail = this.tail.previous
+          this.tail.next = null
+        } else {
+          current.previous.next = current.next
+          current.next.previous = current.previous
+        }
+        this.numberOfValues--
+      }
+      current = current.next
+    }
+  }
+&nbsp;
+  insertAfter (data, toNodeData) {
+    let current = this.head
+    while (current) {
+      if (_.isEqual(current.data, toNodeData)) {
+        let node = new Node(data)
+        if (current === this.tail) {
+          this.add(data)
+        } else {
+          current.next.previous = node
+          node.previous = current
+          node.next = current.next
+          current.next = node
+          this.numberOfValues++
+        }
+      }
+      current = current.next
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  in</span>sertBefore (data, toNodeData) {
+    let current = <span class="cstat-no" title="statement not covered" >this.head</span>
+<span class="cstat-no" title="statement not covered" >    while (current) {</span>
+<span class="cstat-no" title="statement not covered" >      if (_.isEqual(current.data, toNodeData)) {</span>
+<span class="cstat-no" title="statement not covered" >        if (current === this.head) {</span>
+          const node = <span class="cstat-no" title="statement not covered" >new Node(data)</span>
+<span class="cstat-no" title="statement not covered" >          current.previous = node</span>
+<span class="cstat-no" title="statement not covered" >          this.head = node</span>
+<span class="cstat-no" title="statement not covered" >          node.next = current</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >          this.insertAfter(data, current.previous.data)</span>
+        }
+      }
+<span class="cstat-no" title="statement not covered" >      current = current.next</span>
+    }
+  }
+&nbsp;
+  traverse (fn) {
+    let current = this.head
+    while (current) {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (fn) {
+        fn(current)
+      }
+      current = current.next
+    }
+  }
+&nbsp;
+  traverseReverse (fn) {
+    let current = this.tail
+    while (current) {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (fn) {
+        fn(current)
+      }
+      current = current.previous
+    }
+  }
+&nbsp;
+  length () {
+    return this.numberOfValues
+  }
+&nbsp;
+  toString () {
+    let string = ''
+    let current = this.head
+    while (current) {
+      string += `${current.data} `
+      current = current.next
+    }
+    return string.trim()
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  pr</span>int () {
+<span class="cstat-no" title="statement not covered" >    console.log(this.toString())</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  no</span>des () {
+    let nodes = <span class="cstat-no" title="statement not covered" >[]</span>
+    let current = <span class="cstat-no" title="statement not covered" >this.head</span>
+<span class="cstat-no" title="statement not covered" >    while (current) {</span>
+<span class="cstat-no" title="statement not covered" >      nodes.push(current)</span>
+<span class="cstat-no" title="statement not covered" >      current = current.next</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return nodes</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  to</span>JSON () {
+<span class="cstat-no" title="statement not covered" >    return JSON.stringify(this.nodes())</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  st</span>atic fromNodes (nodes) {
+    let doublyLinkedList = <span class="cstat-no" title="statement not covered" >new this()</span>
+<span class="cstat-no" title="statement not covered" >    nodes.forEach(<span class="fstat-no" title="function not covered" >(n</span>ode) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      doublyLinkedList.add(node)</span>
+    })
+<span class="cstat-no" title="statement not covered" >    return doublyLinkedList</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  st</span>atic fromJSON (json) {
+    let nodes = <span class="cstat-no" title="statement not covered" >JSON.parse(json)</span>
+<span class="cstat-no" title="statement not covered" >    return this.fromNodes(nodes)</span>
+  }
+}
+&nbsp;
+module.exports = {
+  List: DoublyLinkedList,
+  Node: Node
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 24 2017 12:53:13 GMT+0200 (CEST)
+</div>
+</div>
+<script src="prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="sorter.js"></script>
+</body>
+</html>

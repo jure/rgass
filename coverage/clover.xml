@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1493031193862" clover="3.2.0">
+  <project timestamp="1493031193862" name="All files">
+    <metrics statements="94" coveredstatements="70" conditionals="26" coveredconditionals="20" methods="21" coveredmethods="14" elements="141" coveredelements="104" complexity="0" loc="94" ncloc="94" packages="1" files="3" classes="3">
+      <file name="doubly-linked-list.js" path="/Users/juretriglav/src/rgass/src/doubly-linked-list.js">
+        <metrics statements="83" coveredstatements="59" conditionals="24" coveredconditionals="18" methods="15" coveredmethods="8"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="16" count="8" type="stmt"/>
+        <line num="17" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="18" count="2" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+        <line num="21" count="6" type="stmt"/>
+        <line num="22" count="6" type="stmt"/>
+        <line num="23" count="6" type="stmt"/>
+        <line num="25" count="8" type="stmt"/>
+        <line num="29" count="5" type="stmt"/>
+        <line num="30" count="5" type="stmt"/>
+        <line num="31" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="4" type="cond" truecount="4" falsecount="0"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="38" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="42" count="1" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
+        <line num="45" count="4" type="stmt"/>
+        <line num="47" count="13" type="stmt"/>
+        <line num="52" count="5" type="stmt"/>
+        <line num="53" count="5" type="stmt"/>
+        <line num="54" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="4" type="stmt"/>
+        <line num="56" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="57" count="1" type="stmt"/>
+        <line num="59" count="3" type="stmt"/>
+        <line num="60" count="3" type="stmt"/>
+        <line num="61" count="3" type="stmt"/>
+        <line num="62" count="3" type="stmt"/>
+        <line num="63" count="3" type="stmt"/>
+        <line num="66" count="22" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
+        <line num="72" count="0" type="stmt"/>
+        <line num="73" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="74" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="77" count="0" type="stmt"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="88" count="2" type="stmt"/>
+        <line num="89" count="2" type="stmt"/>
+        <line num="90" count="14" type="cond" truecount="1" falsecount="1"/>
+        <line num="91" count="14" type="stmt"/>
+        <line num="93" count="14" type="stmt"/>
+        <line num="98" count="2" type="stmt"/>
+        <line num="99" count="2" type="stmt"/>
+        <line num="100" count="10" type="cond" truecount="1" falsecount="1"/>
+        <line num="101" count="10" type="stmt"/>
+        <line num="103" count="10" type="stmt"/>
+        <line num="108" count="7" type="stmt"/>
+        <line num="112" count="15" type="stmt"/>
+        <line num="113" count="15" type="stmt"/>
+        <line num="114" count="15" type="stmt"/>
+        <line num="115" count="53" type="stmt"/>
+        <line num="116" count="53" type="stmt"/>
+        <line num="118" count="15" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="126" count="0" type="stmt"/>
+        <line num="127" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="130" count="0" type="stmt"/>
+        <line num="132" count="0" type="stmt"/>
+        <line num="136" count="0" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+        <line num="141" count="0" type="stmt"/>
+        <line num="142" count="0" type="stmt"/>
+        <line num="144" count="0" type="stmt"/>
+        <line num="148" count="0" type="stmt"/>
+        <line num="149" count="0" type="stmt"/>
+        <line num="153" count="1" type="stmt"/>
+      </file>
+      <file name="node.js" path="/Users/juretriglav/src/rgass/src/node.js">
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="22" count="12" type="stmt"/>
+        <line num="24" count="12" type="stmt"/>
+        <line num="25" count="12" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+      </file>
+      <file name="vector-clock.js" path="/Users/juretriglav/src/rgass/src/vector-clock.js">
+        <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="5"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="7" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+      </file>
+    </metrics>
+  </project>
+</coverage>
