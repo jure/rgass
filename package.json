@@ -24,7 +24,7 @@
     "webpack": "^2.4.1"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --watch",
     "start": "webpack && node .",
     "webpack": "webpack"
   },

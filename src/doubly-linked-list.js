@@ -23,6 +23,7 @@ class DoublyLinkedList {
       this.tail = node
     }
     this.numberOfValues++
+    return node
   }
 
   addToHead (data) {

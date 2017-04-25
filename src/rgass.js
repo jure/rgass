@@ -57,6 +57,12 @@ class Model {
       } else {
         this.localDelete(operation.targetKey, operation.position, operation.delLength, operation.key)
       }
+
+      // TODO improve performance
+      // sync hash table with doubly linked list (update .next and .previous)
+      this.lModel.traverse(node => {
+        this.hashTable[hashKey(node.data.key)] = node
+      })
     })
   }
 
@@ -82,13 +88,20 @@ class Model {
 
   deleteWholeNode (targetNode) {
     targetNode.data.visible = 0
-    return targetNode.data.key
+    return [targetNode.data.key]
   }
 
   deletePriorNode (targetNode, delLength) {
     let fNode, lNode
-    [fNode, lNode] = this.splitTwoNode(targetNode, targetNode.data.key.length - delLength)
+    [fNode, lNode] = this.splitTwoNode(targetNode, delLength)
     fNode.data.visible = 0
+
+    this.lModel.insertBefore(fNode.data, targetNode.data)
+    this.lModel.insertAfter(lNode.data, fNode.data)
+    this.lModel.remove(targetNode.data)
+    this.hashTable[hashKey(fNode.data.key)] = fNode
+    this.hashTable[hashKey(lNode.data.key)] = lNode
+
     return [fNode.data.key, lNode.data.key]
   }
 
@@ -96,15 +109,58 @@ class Model {
     let fNode, lNode
     [fNode, lNode] = this.splitTwoNode(targetNode, targetNode.data.key.length - delLength)
     lNode.data.visible = 0
+
+    this.lModel.insertBefore(fNode.data, targetNode.data)
+    this.lModel.insertAfter(lNode.data, fNode.data)
+    this.lModel.remove(targetNode.data)
+    this.hashTable[hashKey(fNode.data.key)] = fNode
+    this.hashTable[hashKey(lNode.data.key)] = lNode
+
     return [fNode.data.key, lNode.data.key]
   }
 
-  deleteMiddleNode () {
+  deleteMiddleNode (targetNode, position, delLength) {
+    let fNode, mNode, lNode
+    [fNode, mNode, lNode] = this.splitThreeNode(targetNode, position, delLength)
+    mNode.data.visible = 0
 
+    this.lModel.insertBefore(fNode.data, targetNode.data)
+    this.lModel.insertAfter(mNode.data, fNode.data)
+    this.lModel.insertAfter(lNode.data, mNode.data)
+    this.lModel.remove(targetNode.data)
+    this.hashTable[hashKey(fNode.data.key)] = fNode
+    this.hashTable[hashKey(mNode.data.key)] = mNode
+    this.hashTable[hashKey(lNode.data.key)] = lNode
+
+    return [fNode.data.key, mNode.data.key, lNode.data.key]
   }
 
-  deleteMultipleNode () {
+  deleteMultipleNode (targetNode, position, delLength) {
+    let keyList = []
 
+    if (delLength < (targetNode.data.key.length - position)) {
+      return keyList
+    }
+
+    if (position > 1 && delLength > (targetNode.data.key.length - position)) {
+      keyList = keyList.concat(this.deleteLastNode(targetNode, targetNode.data.key.length - position + 1))
+      delLength = delLength - (targetNode.data.key.length - position + 1)
+      targetNode = targetNode.next
+    }
+
+    if (delLength > targetNode.data.key.length) {
+      while (delLength > targetNode.data.key.length) {
+        keyList = keyList.concat(this.deleteWholeNode(targetNode))
+        delLength = delLength - targetNode.data.key.length
+        targetNode = targetNode.next
+      }
+    }
+
+    if (delLength > 0) {
+      keyList = keyList.concat(this.deletePriorNode(targetNode, delLength))
+    }
+
+    return keyList
   }
 
   localDelete (targetKey, position, delLength, key) {
@@ -112,22 +168,25 @@ class Model {
     let length = targetNode.data.key.length
     let keyList = []
 
+    console.log('position', position, 'delLength', delLength, 'length', length)
+
     if (position === 1 && delLength === length) {
-      keyList.push(this.deleteWholeNode(targetNode))
+      keyList = keyList.concat(this.deleteWholeNode(targetNode))
     } else if (position === 1 && delLength < length) {
-      keyList.push(this.deletePriorNode(targetNode))
+      keyList = keyList.concat(this.deletePriorNode(targetNode, delLength))
     }
 
-    if (position > 1 && position + delLength === length) {
-      keyList.push(this.deleteLastNode(targetNode, position - 1))
+    if (position > 1 && position + delLength - 1 === length) {
+      keyList = keyList.concat(this.deleteLastNode(targetNode, delLength))
     }
 
     if (position > 1 && position + delLength - 1 < length) {
-      keyList.push(this.deleteMiddleNode(targetNode, position, delLength))
+      keyList = keyList.concat(this.deleteMiddleNode(targetNode, position, delLength))
     }
 
-    if (position > 1 && position + delLength - 1 > length) {
-      keyList.push(this.deleteMutipleNode(targetNode, position, delLength))
+    // Different than algorithm presented on page 5, we're ignoring pos > 1
+    if (position + delLength - 1 > length) {
+      keyList = keyList.concat(this.deleteMultipleNode(targetNode, position, delLength))
     }
 
     this.broadcast({type: 'delete', position: position, delLength: delLength, keyList: keyList, key: key})
@@ -189,16 +248,20 @@ class Model {
     fNode.data.key.offset = targetNode.data.key.offset
     fNode.data.key.length = position - 1
     fNode.data.str = targetNode.data.str.substr(0, fNode.data.key.length)
+    console.log('created fNode', fNode)
 
     let mNode = _.cloneDeep(targetNode)
     mNode.data.key.offset = targetNode.data.key.offset + position - 1
     mNode.data.key.length = delLength
     mNode.data.str = targetNode.data.str.substr(fNode.data.key.length, mNode.data.key.length)
+    console.log('created mNode', mNode)
 
     let lNode = _.cloneDeep(targetNode)
     lNode.data.key.offset = mNode.data.key.offset + delLength
     lNode.data.key.length = targetNode.data.key.length - fNode.data.key.length - mNode.data.key.length
     lNode.data.str = targetNode.data.str.substr(fNode.data.key.length + mNode.data.key.length, lNode.data.key.length)
+    console.log('created lNode', lNode)
+
     targetNode.data.flag = 1
     targetNode.data.list = [fNode, mNode, lNode]
     return [fNode, mNode, lNode]
