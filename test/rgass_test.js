@@ -313,7 +313,7 @@ describe('Model', () => {
 
       model.applyOperations(generateOps({
         oldText: '',
-        newText: 'Gratinated',
+        newText: 'ABCDEFGHIJ',
         cursor: 10,
         model: model,
         view: view
@@ -322,8 +322,8 @@ describe('Model', () => {
       view.synchronize(model)
 
       model.applyOperations(generateOps({
-        oldText: 'Gratinated',
-        newText: 'Grated',
+        oldText: 'ABCDEFGHIJ',
+        newText: 'ABCHIJ',
         cursor: 3,
         model: model,
         view: view
@@ -331,7 +331,7 @@ describe('Model', () => {
 
       view.synchronize(model)
 
-      expect(view.toString()).toEqual('Grated')
+      expect(view.toString()).toEqual('ABCHIJ')
     })
 
     it('can delete by creating a split node (deleting the last of the new 2 nodes)', () => {
@@ -490,6 +490,48 @@ describe('Model', () => {
       view.synchronize(model)
 
       expect(view.toString()).toEqual('abi')
+    })
+
+    it('can delete nodes after one of them has been split', () => {
+      let model = new Model({
+        siteId: 1,
+        session: 1
+      })
+
+      let view = new View()
+      view.synchronize(model)
+
+      model.applyOperations(generateOps({
+        oldText: '',
+        newText: 'ABCDEFGH',
+        cursor: 8,
+        model: model,
+        view: view
+      }))
+
+      view.synchronize(model)
+
+      model.applyOperations(generateOps({
+        oldText: 'ABCDEFGH',
+        newText: 'ABCDGH',
+        cursor: 4,
+        model: model,
+        view: view
+      }))
+
+      view.synchronize(model)
+
+      model.applyOperations(generateOps({
+        oldText: 'ABCDGH',
+        newText: '',
+        cursor: 0,
+        model: model,
+        view: view
+      }))
+
+      view.synchronize(model)
+
+      expect(view.toString()).toEqual('')
     })
   })
 })
