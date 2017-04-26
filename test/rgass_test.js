@@ -87,24 +87,6 @@ describe('Model', () => {
       expect(view.toString()).toEqual('cdab')
     })
 
-    it('can perform local insertion operations', () => {
-      let model = new Model({
-        siteId: 1,
-        session: 1
-      })
-
-      model.applyOperations([op1])
-      model.applyOperations([op2])
-      model.applyOperations([op3])
-      model.applyOperations([op4])
-
-      let view = new View()
-      view.synchronize(model)
-
-      expect(view.toString()).toEqual('cdab')
-    })
-
-
     it('can synchronize with remote sites', () => {
       let remoteModel = new Model({
         siteId: 2,
@@ -298,6 +280,60 @@ describe('Model', () => {
       view.synchronize(model)
 
       expect(view.toString()).toEqual('a')
+    })
+
+    it('can synchronize a single character deletion', () => {
+      // This also tests view synchronization as it's the easiest
+      // way to generate operations
+
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => remoteModel.applyRemoteOperations(operations)
+      })
+
+      let view = new View()
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'a',
+        cursor: 1,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'a',
+        newText: 'ab',
+        cursor: 2,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'ab',
+        newText: 'a',
+        cursor: 1,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      expect(view.toString()).toEqual('a')
+      expect(remoteView.toString()).toEqual('a')
     })
   })
 
@@ -532,6 +568,73 @@ describe('Model', () => {
       view.synchronize(model)
 
       expect(view.toString()).toEqual('')
+    })
+
+    it('can synchronize multi-node deletions', () => {
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => remoteModel.applyRemoteOperations(operations)
+      })
+
+      let view = new View()
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'abc',
+        cursor: 3,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'abc',
+        newText: 'abcdef',
+        cursor: 6,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'abcdef',
+        newText: 'abcdefghi',
+        cursor: 9,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+      console.log('Before deletion local', localModel.lModel)
+      console.log('Before deletion remote', remoteModel.lModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'abcdefghi',
+        newText: 'abi',
+        cursor: 2,
+        model: localModel,
+        view: view
+      }))
+
+      console.log('After deletion local', localModel.lModel)
+      console.log('After deletion remote', remoteModel.lModel)
+      view.synchronize(localModel)
+
+      expect(view.toString()).toEqual('abi')
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      expect(remoteView.toString()).toEqual('abi')
     })
   })
 })
