@@ -12,8 +12,7 @@ class DoublyLinkedList {
     this.numberOfValues = 0
   }
 
-  add (data) {
-    const node = new Node(data)
+  add (node) {
     if (!this.head) {
       this.head = node
       this.tail = node
@@ -23,21 +22,20 @@ class DoublyLinkedList {
       this.tail = node
     }
     this.numberOfValues++
-    return node
   }
 
-  addToHead (data) {
+  addToHead (node) {
     if (!this.head) {
-      this.add(data)
+      this.add(node)
     } else {
-      this.insertBefore(data, this.head.data)
+      this.insertBefore(node, this.head)
     }
   }
 
-  remove (data) {
+  remove (node) {
     let current = this.head
     while (current) {
-      if (_.isEqual(current.data, data)) {
+      if (_.isEqual(current.data, node.data)) {
         if (current === this.head && current === this.tail) {
           this.head = null
           this.tail = null
@@ -57,13 +55,12 @@ class DoublyLinkedList {
     }
   }
 
-  insertAfter (data, toNodeData) {
+  insertAfter (node, toNode) {
     let current = this.head
     while (current) {
-      if (_.isEqual(current.data, toNodeData)) {
-        let node = new Node(data)
+      if (_.isEqual(current.data, toNode.data)) {
         if (current === this.tail) {
-          this.add(data)
+          this.add(node)
         } else {
           current.next.previous = node
           node.previous = current
@@ -76,17 +73,17 @@ class DoublyLinkedList {
     }
   }
 
-  insertBefore (data, toNodeData) {
+  insertBefore (node, toNode) {
     let current = this.head
     while (current) {
-      if (_.isEqual(current.data, toNodeData)) {
+      if (_.isEqual(current.data, toNode.data)) {
         if (current === this.head) {
-          const node = new Node(data)
           current.previous = node
           this.head = node
           node.next = current
+          this.numberOfValues++
         } else {
-          this.insertAfter(data, current.previous.data)
+          this.insertAfter(node, current.previous)
         }
       }
       current = current.next
