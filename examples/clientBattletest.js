@@ -12,6 +12,24 @@ function setup (textElement, socket) {
   var view
   var oldText = ''
 
+  let update = () => {
+    var ops = generateOps({
+      oldText: oldText,
+      newText: textElement.value,
+      cursor: textElement.selectionEnd,
+      model: model,
+      view: view
+    })
+
+    model.applyOperations(ops) // this also broadcasts operations remotely
+    console.log('local operations', model.siteId, JSON.stringify(ops))
+    view.synchronize(model)
+    textElement.value = view.toString()
+    oldText = textElement.value
+  }
+
+  textElement.addEventListener('input', event => update())
+
   socket.on('model', function (modelJson, siteId) {
     console.log('model from server', modelJson)
 
@@ -34,21 +52,7 @@ function setup (textElement, socket) {
     // text.selectionEnd = points[1];
   })
 
-  return () => {
-    var ops = generateOps({
-      oldText: oldText,
-      newText: textElement.value,
-      cursor: textElement.selectionEnd,
-      model: model,
-      view: view
-    })
-
-    model.applyOperations(ops) // this also broadcasts operations remotely
-    console.log('local operations', model.siteId, JSON.stringify(ops))
-    view.synchronize(model)
-    textElement.value = view.toString()
-    oldText = textElement.value
-  }
+  return update
 }
 
 function broadcast (socket) {
@@ -75,12 +79,13 @@ function changeText (textElement, update) {
   return () => {
     let randomLength = Math.ceil(Math.random() * 11)
     let currentText = textElement.value
-    if (Math.random() >= 0.5) {
-      textElement.value = currentText + Math.random().toString(36).substr(2, randomLength)
-    } else {
-      let randomPosition = Math.floor(Math.random() * currentText.length)
-      textElement.value = currentText.substring(0, randomPosition) + currentText.substring(randomPosition + randomLength)
-    }
+    // if (Math.random() >= 0.0) {
+    textElement.value = currentText + Math.random().toString(36).substr(2, randomLength)
+    // } else {
+    //   let randomPosition = Math.floor(Math.random() * currentText.length)
+    //   textElement.value = currentText.substring(0, randomPosition) + currentText.substring(randomPosition + randomLength)
+    //   textElement.selectionEnd = randomPosition
+    // }
     update()
   }
 }
@@ -88,19 +93,28 @@ function changeText (textElement, update) {
 let interval1
 let interval2
 
-startButton.addEventListener('click', function (event) {
+startButton.addEventListener('click', event => {
   if (!interval1 && !interval2) {
     interval1 = window.setInterval(changeText(text1, update1), 1000)
-    interval2 = window.setInterval(changeText(text2, update2), 1111)
+    interval2 = window.setInterval(changeText(text2, update2), 1000)
     backgroundColor()
+  }
+})
+
+let nextButton = document.getElementById('next')
+
+nextButton.addEventListener('click', event => {
+  if (!interval1 && !interval2) {
+    changeText(text1, update1)()
+    changeText(text2, update2)()
   }
 })
 
 let stopButton = document.getElementById('stop')
 
-stopButton.addEventListener('click', function (event) {
-  clearInterval(interval1)
-  clearInterval(interval2)
+stopButton.addEventListener('click', event => {
+  interval1 = clearInterval(interval1)
+  interval2 = clearInterval(interval2)
   if (text1.value === text2.value) {
     backgroundColor('#228B22')
   } else {

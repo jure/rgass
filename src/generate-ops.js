@@ -27,7 +27,7 @@ const diffToOps = (diff, model, view) => {
       session: 1,
       ssv: model.incrementVectorClock(),
       site: model.siteId,
-      offset: positionWithinNode,
+      offset: 0,
       length: end - start
     }
     result.push({
@@ -47,7 +47,7 @@ const diffToOps = (diff, model, view) => {
       session: 1,
       ssv: model.incrementVectorClock(),
       site: model.siteId,
-      offset: positionWithinNode,
+      offset: 0,
       length: newstr.length
     }
 
@@ -60,7 +60,7 @@ const diffToOps = (diff, model, view) => {
     })
   }
 
-  log('generate ops', result)
+  log('generate ops', model.siteId, result)
   return result
 }
 

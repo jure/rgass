@@ -59,11 +59,6 @@ class Model {
       } else {
         this.localDelete(operation.targetKey, operation.position, operation.delLength, operation.key)
       }
-      // TODO improve performance
-      // sync hash table with doubly linked list (update .next and .previous)
-      // this.lModel.traverse(node => {
-      //   this.hashTable[hashKey(node.data.key)] = node
-      // })
     })
   }
 
@@ -302,7 +297,7 @@ class Model {
         if (id1.site < id2.site) {
           return id1
         } else if (id1.site === id2.site) {
-          if (id1.offset < id2.offset) {
+          if (id1.offset > id2.offset) {
             return id1
           } else {
             return id2
@@ -319,7 +314,7 @@ class Model {
   }
 
   // Based on definition 5, page 11
-  predeccesorNode (node1, node2) {
+  predecessorNode (node1, node2) {
     if (this.predecessorId(node1.data.key, node2.key) === node1.data.key) {
       return node2
     } else {
