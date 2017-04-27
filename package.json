@@ -26,7 +26,8 @@
   "scripts": {
     "test": "jest --watch",
     "start": "npm run webpack && node ./examples",
-    "webpack": "webpack --config examples/webpack.config.js"
+    "webpack": "webpack --config examples/webpack.config.js",
+    "battletest": "webpack --config examples/webpackBattletest.config.js && node ./examples/indexBattletest.js"
   },
   "author": "Collaborative Knowledge Foundation",
   "jest": {
