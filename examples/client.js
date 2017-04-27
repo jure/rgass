@@ -1,8 +1,8 @@
 // diff adapted from https://github.com/google/ot-crdt-papers/blob/master/ot_toy.js
 
-const Model = require('./src/rgass').Model
-const View = require('./src/rgass').View
-const generateOps = require('./src/generate-ops')
+const Model = require('../src/rgass').Model
+const View = require('../src/rgass').View
+const generateOps = require('../src/generate-ops')
 
 var textElement = document.getElementById('text')
 var oldText = ''
