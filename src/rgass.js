@@ -59,7 +59,6 @@ class Model {
       } else {
         this.localDelete(operation.targetKey, operation.position, operation.delLength, operation.key)
       }
-
       // TODO improve performance
       // sync hash table with doubly linked list (update .next and .previous)
       // this.lModel.traverse(node => {
@@ -331,6 +330,7 @@ class Model {
   applyRemoteOperations (operations) {
     operations.forEach(operation => {
       log('Applying remote operation', operation)
+      this.incrementVectorClock(operation.key.site)
       if (operation.type === 'insert') {
         this.remoteInsert(operation.targetKey,
           operation.position,

@@ -109,6 +109,60 @@ describe('Model', () => {
 
       expect(view.toString()).toEqual('cdab')
     })
+
+    it('can synchronize with remote sites #2', () => {
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => remoteModel.applyRemoteOperations(operations)
+      })
+
+      remoteModel.broadcast = (operations) => localModel.applyRemoteOperations(operations)
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'A',
+        cursor: 1,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'A',
+        newText: 'AB',
+        cursor: 2,
+        model: localModel,
+        view: localView
+      }))
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'AB',
+        newText: 'ABC',
+        cursor: 3,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      localView.synchronize(localModel)
+      expect(localView.toString()).toEqual('ABC')
+
+      console.log(remoteModel.lModel.nodes())
+      remoteView.synchronize(remoteModel)
+      expect(remoteView.toString()).toEqual('ABC')
+    })
   })
 
   describe('string (multichar) insertions', () => {
@@ -615,9 +669,6 @@ describe('Model', () => {
 
       view.synchronize(localModel)
 
-      console.log('del l', localModel.lModel)
-      console.log('del r', remoteModel.lModel)
-
       localModel.applyOperations(generateOps({
         oldText: 'abcdefghi',
         newText: 'abi',
@@ -625,9 +676,6 @@ describe('Model', () => {
         model: localModel,
         view: view
       }))
-
-      console.log('del l', localModel.lModel)
-      console.log('del r', remoteModel.lModel)
 
       view.synchronize(localModel)
 
