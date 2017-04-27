@@ -614,8 +614,9 @@ describe('Model', () => {
       }))
 
       view.synchronize(localModel)
-      console.log('Before deletion local', localModel.lModel)
-      console.log('Before deletion remote', remoteModel.lModel)
+
+      console.log('del l', localModel.lModel)
+      console.log('del r', remoteModel.lModel)
 
       localModel.applyOperations(generateOps({
         oldText: 'abcdefghi',
@@ -625,8 +626,9 @@ describe('Model', () => {
         view: view
       }))
 
-      console.log('After deletion local', localModel.lModel)
-      console.log('After deletion remote', remoteModel.lModel)
+      console.log('del l', localModel.lModel)
+      console.log('del r', remoteModel.lModel)
+
       view.synchronize(localModel)
 
       expect(view.toString()).toEqual('abi')
@@ -635,6 +637,59 @@ describe('Model', () => {
       remoteView.synchronize(remoteModel)
 
       expect(remoteView.toString()).toEqual('abi')
+    })
+
+    it('can synchronize multi-node deletions of everything', () => {
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => remoteModel.applyRemoteOperations(operations)
+      })
+
+      let view = new View()
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'A',
+        cursor: 1,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'A',
+        newText: 'AB',
+        cursor: 2,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'AB',
+        newText: '',
+        cursor: 0,
+        model: localModel,
+        view: view
+      }))
+
+      view.synchronize(localModel)
+
+      expect(view.toString()).toEqual('')
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      expect(remoteView.toString()).toEqual('')
     })
   })
 })

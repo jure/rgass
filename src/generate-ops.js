@@ -1,3 +1,5 @@
+const log = require('./logger')
+
 const diffToOps = (diff, model, view) => {
   var start = diff[0]
   var end = diff[1]
@@ -25,7 +27,7 @@ const diffToOps = (diff, model, view) => {
       session: 1,
       ssv: model.incrementVectorClock(),
       site: model.siteId,
-      offset: positionWithinNode - 1,
+      offset: positionWithinNode,
       length: end - start
     }
     result.push({
@@ -58,12 +60,12 @@ const diffToOps = (diff, model, view) => {
     })
   }
 
-  console.log(result)
+  log(result)
   return result
 }
 
 const getDiff = (oldText, newText, cursor) => {
-  console.log('getDiff', oldText, newText, cursor)
+  log('getDiff', oldText, newText, cursor)
 
   var delta = newText.length - oldText.length
   var limit = Math.max(0, cursor - delta)

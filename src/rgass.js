@@ -4,6 +4,8 @@ const Node = require('./doubly-linked-list.js').Node
 const VectorClock = require('./vector-clock')
 const _ = require('lodash')
 
+const log = require('./logger')
+
 function hashKey (key) {
   return JSON.stringify(key)
 }
@@ -51,7 +53,7 @@ class Model {
 
   applyOperations (operations) {
     operations.forEach(operation => {
-      console.log('Applying local operation', operation)
+      log('Applying local operation', operation)
       if (operation.type === 'insert') {
         this.localInsert(operation.targetKey, operation.position, operation.str, operation.key)
       } else {
@@ -126,7 +128,7 @@ class Model {
 
     return [{
       key: targetNode.data.key,
-      position: targetNode.data.key.length - delLength,
+      position: targetNode.data.key.length - delLength + 1,
       delLength: delLength
     }]
   }
@@ -152,7 +154,7 @@ class Model {
   }
 
   deleteMultipleNode (targetNode, position, delLength) {
-    console.log(targetNode)
+    log(targetNode)
     let keyList = []
 
     if (delLength < (targetNode.data.key.length - position)) {
@@ -168,11 +170,11 @@ class Model {
     if (delLength > targetNode.data.key.length) {
       while (targetNode && delLength >= targetNode.data.key.length) {
         if (targetNode.data.visible) {
-          console.log('deleting', targetNode.data.str, 'because delLength', delLength, '>', targetNode.data.key.length)
+          log('deleting', targetNode.data.str, 'because delLength', delLength, '>', targetNode.data.key.length)
           keyList = keyList.concat(this.deleteWholeNode(targetNode))
           delLength = delLength - targetNode.data.key.length
         } else {
-          console.log('targetNode', targetNode.data.str, 'is invisible already, skipping')
+          log('targetNode', targetNode.data.str, 'is invisible already, skipping')
         }
         targetNode = targetNode.next
       }
@@ -192,7 +194,7 @@ class Model {
     // in this regards, adds all created subnodes to keyList
     let keyList = []
 
-    console.log('position', position, 'delLength', delLength, 'length', length)
+    log('position', position, 'delLength', delLength, 'length', length)
 
     if (position === 1 && delLength === length) {
       keyList = keyList.concat(this.deleteWholeNode(targetNode))
@@ -222,7 +224,7 @@ class Model {
     let newNode = new Node({key: key, str: str, visible: 1})
 
     let targetNode = targetKey && this.hashTable[hashKey(targetKey)]
-    console.log('Found targetNode', targetNode)
+    log('Found targetNode', targetNode)
 
     if (!targetNode && position === 0) {
       this.lModel.addToHead(newNode)
@@ -253,13 +255,13 @@ class Model {
     fNode.data.key.offset = targetNode.data.key.offset
     fNode.data.key.length = position
     fNode.data.str = targetNode.data.str.substr(0, position)
-    console.log('created fNode', fNode)
+    log('created fNode', fNode)
 
     let lNode = _.cloneDeep(targetNode)
     lNode.data.key.offset = targetNode.data.key.offset + position
     lNode.data.key.length = targetNode.data.key.length - position
     lNode.data.str = targetNode.data.str.substr(position, targetNode.data.key.length - fNode.data.key.length)
-    console.log('created lNode', lNode)
+    log('created lNode', lNode)
 
     targetNode.data.flag = 1
     targetNode.data.list = [fNode, lNode]
@@ -271,19 +273,19 @@ class Model {
     fNode.data.key.offset = targetNode.data.key.offset
     fNode.data.key.length = position - 1
     fNode.data.str = targetNode.data.str.substr(0, fNode.data.key.length)
-    console.log('created fNode', fNode)
+    log('created fNode', fNode)
 
     let mNode = _.cloneDeep(targetNode)
     mNode.data.key.offset = targetNode.data.key.offset + position - 1
     mNode.data.key.length = delLength
     mNode.data.str = targetNode.data.str.substr(fNode.data.key.length, mNode.data.key.length)
-    console.log('created mNode', mNode)
+    log('created mNode', mNode)
 
     let lNode = _.cloneDeep(targetNode)
     lNode.data.key.offset = mNode.data.key.offset + delLength
     lNode.data.key.length = targetNode.data.key.length - fNode.data.key.length - mNode.data.key.length
     lNode.data.str = targetNode.data.str.substr(fNode.data.key.length + mNode.data.key.length, lNode.data.key.length)
-    console.log('created lNode', lNode)
+    log('created lNode', lNode)
 
     targetNode.data.flag = 1
     targetNode.data.list = [fNode, mNode, lNode]
@@ -328,7 +330,7 @@ class Model {
 
   applyRemoteOperations (operations) {
     operations.forEach(operation => {
-      console.log('Applying remote operation', operation)
+      log('Applying remote operation', operation)
       if (operation.type === 'insert') {
         this.remoteInsert(operation.targetKey,
           operation.position,
@@ -353,24 +355,19 @@ class Model {
     if (count === 1) {
       this.del(position, delLength, targetNode)
     } else {
-      console.log('AAAAA0', keyList[0].position, targetNode.data.key.length - position + 1)
-
-      this.del(keyList[0].position + 1, targetNode.data.key.length - keyList[0].position + 1, targetNode)
-
       let sumLength = targetNode.data.key.length - keyList[0].position + 1
+
+      this.del(keyList[0].position, keyList[0].delLength, targetNode)
+
       let p = 1
 
-      console.log('AAAAA1', sumLength)
       for (let i = 1; i < count - 1; i++) {
-        console.log('AAAAA1.5', i, count, keyList)
         let tempnode = this.hashTable[hashKey(keyList[i].key)]
         this.del(p, keyList[i].key.length, tempnode)
         sumLength += keyList[i].key.length
-        console.log('AAAAA2', sumLength)
       }
 
-      let lastLength = delLength - sumLength + 1
-      console.log('AAAAA3', lastLength)
+      let lastLength = delLength - sumLength
 
       let lastNode = this.hashTable[hashKey(keyList[count - 1].key)]
 
@@ -381,6 +378,8 @@ class Model {
 
   del (position, delLength, targetNode) {
     let l = targetNode.data.key.length
+
+    log('del', position, delLength, targetNode)
 
     if (!targetNode.flag) {
       if (position === 1 && delLength === l) {
@@ -393,7 +392,7 @@ class Model {
         this.deleteMiddleNode(targetNode, position, delLength)
       }
     } else {
-      console.log('targetNode', targetNode.data)
+      log('targetNode', targetNode.data)
       let sub1 = targetNode.data.list[0]
       let sub2 = targetNode.data.list[1]
       let sub3 = targetNode.data.list[2]
