@@ -22,6 +22,6 @@ npm run battletest
 
 # TODO
 
-[ ] Serialization of Model
-[ ] Snapshotting (related to above)
-[ ] More bulletproofing
+- [ ] Serialization of Model
+- [ ] Snapshotting (related to above)
+- [ ] More bulletproofing
