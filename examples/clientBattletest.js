@@ -27,7 +27,7 @@ function setup (textElement, socket) {
     textElement.value = view.toString()
     oldText = textElement.value
 
-    console.log(model.lModel.nodes())
+    console.log(model.siteId, model.lModel.nodes())
   }
 
   textElement.addEventListener('input', event => update())

@@ -65,7 +65,7 @@ const diffToOps = (diff, model, view) => {
 }
 
 const getDiff = (oldText, newText, cursor) => {
-  log('generate ops', oldText, newText, cursor)
+  // log('generate ops', oldText, newText, cursor)
 
   var delta = newText.length - oldText.length
   var limit = Math.max(0, cursor - delta)
