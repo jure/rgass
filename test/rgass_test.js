@@ -739,5 +739,88 @@ describe('Model', () => {
 
       expect(remoteView.toString()).toEqual('')
     })
+
+    it('regression test - overlapping deletions', () => {
+      let remoteModelRemoteOperations = []
+      let localModelRemoteOperations = []
+
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1,
+        broadcast: (operations) => {
+          localModelRemoteOperations = localModelRemoteOperations.concat(operations)
+        }
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => {
+          remoteModelRemoteOperations = remoteModelRemoteOperations.concat(operations)
+        }
+      })
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: '',
+        cursor: 0,
+        model: localModel,
+        view: localView
+      }))
+
+      remoteModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'wtuv',
+        cursor: 4,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('wtuv')
+      expect(remoteView.toString()).toEqual('wtuv')
+
+      localModel.applyOperations(generateOps({
+        oldText: 'wtuv',
+        newText: 'wt',
+        cursor: 2,
+        model: localModel,
+        view: localView
+      }))
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'wtuv',
+        newText: 'w',
+        cursor: 1,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('w')
+      expect(remoteView.toString()).toEqual('w')
+    })
   })
 })

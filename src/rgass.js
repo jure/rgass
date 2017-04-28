@@ -53,7 +53,7 @@ class Model {
 
   applyOperations (operations) {
     operations.forEach(operation => {
-      log('Applying local operation', operation)
+      log('local operation', operation)
       if (operation.type === 'insert') {
         this.localInsert(operation.targetKey, operation.position, operation.str, operation.key)
       } else {
@@ -187,8 +187,6 @@ class Model {
     // only tombstones! algorithm 6 on page 5 is different
     // in this regards, adds all created subnodes to keyList
     let keyList = []
-
-    log('position', position, 'delLength', delLength, 'length', length)
 
     if (position === 1 && delLength === length) {
       keyList = keyList.concat(this.deleteWholeNode(targetNode))
@@ -324,7 +322,7 @@ class Model {
 
   applyRemoteOperations (operations) {
     operations.forEach(operation => {
-      log('Applying remote operation', operation)
+      log('remote operation', operation)
       this.incrementVectorClock(operation.key.site)
       if (operation.type === 'insert') {
         this.remoteInsert(operation.targetKey,
@@ -376,7 +374,7 @@ class Model {
 
     log('del', position, delLength, targetNode)
 
-    if (!targetNode.flag) {
+    if (!targetNode.data.flag) {
       if (position === 1 && delLength === l) {
         this.deleteWholeNode(targetNode)
       } else if (position === 1 && delLength < l) {
@@ -387,7 +385,7 @@ class Model {
         this.deleteMiddleNode(targetNode, position, delLength)
       }
     } else {
-      log('targetNode', targetNode.data)
+      log('split targetNode', targetNode.data)
       let sub1 = targetNode.data.list[0]
       let sub2 = targetNode.data.list[1]
       let sub3 = targetNode.data.list[2]

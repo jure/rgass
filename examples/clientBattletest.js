@@ -26,6 +26,8 @@ function setup (textElement, socket) {
     view.synchronize(model)
     textElement.value = view.toString()
     oldText = textElement.value
+
+    console.log(model.lModel.nodes())
   }
 
   textElement.addEventListener('input', event => update())
@@ -79,13 +81,13 @@ function changeText (textElement, update) {
   return () => {
     let randomLength = Math.ceil(Math.random() * 11)
     let currentText = textElement.value
-    // if (Math.random() >= 0.0) {
-    textElement.value = currentText + Math.random().toString(36).substr(2, randomLength)
-    // } else {
-    //   let randomPosition = Math.floor(Math.random() * currentText.length)
-    //   textElement.value = currentText.substring(0, randomPosition) + currentText.substring(randomPosition + randomLength)
-    //   textElement.selectionEnd = randomPosition
-    // }
+    if (Math.random() >= 0.5) {
+      textElement.value = currentText + Math.random().toString(36).substr(2, randomLength)
+    } else {
+      let randomPosition = Math.floor(Math.random() * currentText.length)
+      textElement.value = currentText.substring(0, randomPosition) + currentText.substring(randomPosition + randomLength)
+      textElement.selectionEnd = randomPosition
+    }
     update()
   }
 }
