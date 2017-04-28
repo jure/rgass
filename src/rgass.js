@@ -425,10 +425,23 @@ class Model {
 
     if (targetNode) {
       if (position === targetNode.data.key.length) {
-        while (targetNode && (key === this.predecessorId(key, targetNode.data.key))) {
-          targetNode = targetNode.next
+        let previous
+        let current = targetNode.next
+
+        while (current) {
+          if (key === this.predecessorId(key, current.data.key)) {
+            previous = current
+            current = current.next
+          } else {
+            current = undefined
+          }
         }
-        this.lModel.insertAfter(newNode, targetNode)
+
+        if (previous) {
+          this.lModel.insertAfter(newNode, previous)
+        } else {
+          this.lModel.insertAfter(newNode, targetNode)
+        }
       } else {
         let fNode, lNode
         [fNode, lNode] = this.splitTwoNode(targetNode, position)

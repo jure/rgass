@@ -32,6 +32,14 @@ class DoublyLinkedList {
     }
   }
 
+  addToTail (node) {
+    if (!this.tail) {
+      this.add(node)
+    } else {
+      this.insertAfter(node, this.tail)
+    }
+  }
+
   remove (node) {
     let current = this.head
     while (current) {
