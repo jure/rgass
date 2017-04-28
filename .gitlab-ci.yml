@@ -1,0 +1,11 @@
+before_script:
+  - apt-get update -y
+  - apt-get install -y libssl-dev build-essential wget
+  - npm install -g node-gyp
+  - npm install -g mocha
+  - npm install
+
+test:
+  script:
+    - npm run test
+
