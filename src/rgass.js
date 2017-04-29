@@ -10,15 +10,6 @@ function hashKey (key) {
   return JSON.stringify(key)
 }
 
-// temp
-
-function logOps (message, model) {
-  console.log(message, model.siteId, Object.keys(model.hashTable).map(key => {
-    let nodeData = model.hashTable[key].data
-    return key + ': ' + nodeData.str + ' visible ' + nodeData.visible
-  }))
-}
-
 class Model {
   constructor (options) {
     this.hashTable = options.hashTable || {}
@@ -61,8 +52,6 @@ class Model {
   }
 
   applyOperations (operations) {
-    logOps('before local operations', this)
-
     operations.forEach(operation => {
       log('local operation', this.siteId, operation)
       if (operation.type === 'insert') {
@@ -71,7 +60,6 @@ class Model {
         this.localDelete(operation.targetKey, operation.position, operation.delLength, operation.key)
       }
     })
-    logOps('after local operations', this)
   }
 
   findNode (targetKey, position) {
@@ -95,6 +83,8 @@ class Model {
       }
     }
 
+    // This is not accounted for in the paper, page 4, algorithm 5.
+    // Position changes if subnodes are traversed.
     return [targetNode, newPosition]
   }
 
@@ -177,18 +167,15 @@ class Model {
       targetNode = targetNode.next
     }
 
-    if (delLength > targetNode.data.key.length) {
-      while (targetNode && delLength >= targetNode.data.key.length) {
-        if (targetNode.data.visible) {
-          log('deleting', targetNode.data.str, 'because delLength', delLength, '>', targetNode.data.key.length)
-          keyList = keyList.concat(this.deleteWholeNode(targetNode))
-          delLength = delLength - targetNode.data.key.length
-          console.log(delLength)
-        } else {
-          log('targetNode', targetNode.data.str, 'is invisible already, skipping')
-        }
-        targetNode = targetNode.next
+    while (targetNode && delLength >= targetNode.data.key.length) {
+      if (targetNode.data.visible) {
+        log('deleting', targetNode.data.str, 'because delLength', delLength, '>', targetNode.data.key.length)
+        keyList = keyList.concat(this.deleteWholeNode(targetNode))
+        delLength = delLength - targetNode.data.key.length
+      } else {
+        log('targetNode', targetNode.data.str, 'is invisible already, skipping')
       }
+      targetNode = targetNode.next
     }
 
     if (delLength > 0) {
@@ -265,7 +252,7 @@ class Model {
   }
 
   splitTwoNode (targetNode, position) {
-    console.log('splitting node in two', this.siteId, targetNode, position)
+    log('splitting node in two', this.siteId, targetNode, position)
     let fNode = _.cloneDeep(targetNode)
     fNode.data.key.offset = targetNode.data.key.offset
     fNode.data.key.length = position
@@ -276,7 +263,6 @@ class Model {
     lNode.data.key.offset = targetNode.data.key.offset + position
     lNode.data.key.length = targetNode.data.key.length - position
 
-    console.log(lNode.data.key.length < 0, 'ERROR')
     lNode.data.str = targetNode.data.str.substr(position, targetNode.data.key.length - fNode.data.key.length)
     log('created lNode', lNode)
 
@@ -347,8 +333,6 @@ class Model {
   }
 
   applyRemoteOperations (operations) {
-    logOps('before remote operations', this)
-
     operations.forEach(operation => {
       log('remote operation', this.siteId, operation)
       this.incrementVectorClock(operation.key.site)
@@ -367,7 +351,6 @@ class Model {
         )
       }
     })
-    logOps('after remote operations', this)
   }
 
   remoteDelete (position, delLength, keyList, key) {
@@ -401,7 +384,7 @@ class Model {
   del (position, delLength, targetNode) {
     let l = targetNode.data.key.length
 
-    log('del', position, delLength, targetNode)
+    log('del', this.siteId, position, delLength, targetNode)
 
     if (!targetNode.data.flag) {
       if (position === 1 && delLength === l) {
@@ -451,7 +434,7 @@ class Model {
     let targetNode, newPosition
     [targetNode, newPosition] = this.findNode(targetKey, position)
 
-    console.log('targetNode', targetNode, 'newPosition', newPosition)
+    log('remote insert', 'targetNode', targetNode, 'newPosition', newPosition)
 
     if (targetNode) {
       if (newPosition === targetNode.data.key.length) {
