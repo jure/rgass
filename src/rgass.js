@@ -425,7 +425,7 @@ class Model {
       if (position <= l1 && position + delLength <= l1) {
         this.del(position, delLength, sub1)
       } else if (position <= l1 && delLength - (l1 - position + 1) <= l2) {
-        this.del(position, l1 + position + 1, sub1)
+        this.del(position, l1 - position + 1, sub1)
         this.del(1, delLength - (l1 - position + 1), sub2)
       } else if (position <= l1 && delLength - (l1 - position + 1) >= l2) {
         let p = l1 - position + 1
