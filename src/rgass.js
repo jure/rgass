@@ -94,7 +94,8 @@ class Model {
         newPosition = position - targetNode.data.key.offset
       }
     }
-
+    if (newPosition <= 0) debugger
+    if (newPosition > targetNode.data.key.length) debugger
     return [targetNode, newPosition]
   }
 
@@ -115,8 +116,8 @@ class Model {
     this.lModel.insertBefore(fNode, targetNode)
     this.lModel.insertAfter(lNode, fNode)
     this.lModel.remove(targetNode)
-    this.hashTable[hashKey(fNode.data.key)] = fNode
-    this.hashTable[hashKey(lNode.data.key)] = lNode
+    this.addToHashTable(fNode.data.key, fNode)
+    this.addToHashTable(lNode.data.key, lNode)
 
     return [{
       key: targetNode.data.key,
@@ -133,8 +134,8 @@ class Model {
     this.lModel.insertBefore(fNode, targetNode)
     this.lModel.insertAfter(lNode, fNode)
     this.lModel.remove(targetNode)
-    this.hashTable[hashKey(fNode.data.key)] = fNode
-    this.hashTable[hashKey(lNode.data.key)] = lNode
+    this.addToHashTable(fNode.data.key, fNode)
+    this.addToHashTable(lNode.data.key, lNode)
 
     return [{
       key: targetNode.data.key,
@@ -152,9 +153,9 @@ class Model {
     this.lModel.insertAfter(mNode, fNode)
     this.lModel.insertAfter(lNode, mNode)
     this.lModel.remove(targetNode)
-    this.hashTable[hashKey(fNode.data.key)] = fNode
-    this.hashTable[hashKey(mNode.data.key)] = mNode
-    this.hashTable[hashKey(lNode.data.key)] = lNode
+    this.addToHashTable(fNode.data.key, fNode)
+    this.addToHashTable(mNode.data.key, mNode)
+    this.addToHashTable(lNode.data.key, lNode)
 
     return [{
       key: targetNode.data.key,
@@ -177,18 +178,16 @@ class Model {
       targetNode = targetNode.next
     }
 
-    if (delLength > targetNode.data.key.length) {
-      while (targetNode && delLength >= targetNode.data.key.length) {
-        if (targetNode.data.visible) {
-          log('deleting', targetNode.data.str, 'because delLength', delLength, '>', targetNode.data.key.length)
-          keyList = keyList.concat(this.deleteWholeNode(targetNode))
-          delLength = delLength - targetNode.data.key.length
-          console.log(delLength)
-        } else {
-          log('targetNode', targetNode.data.str, 'is invisible already, skipping')
-        }
-        targetNode = targetNode.next
+    while (targetNode && delLength >= targetNode.data.key.length) {
+      if (targetNode.data.visible) {
+        log('deleting', targetNode.data.str, 'because delLength', delLength, '>', targetNode.data.key.length)
+        keyList = keyList.concat(this.deleteWholeNode(targetNode))
+        delLength = delLength - targetNode.data.key.length
+        console.log(delLength)
+      } else {
+        log('targetNode', targetNode.data.str, 'is invisible already, skipping')
       }
+      targetNode = targetNode.next
     }
 
     if (delLength > 0) {
@@ -252,12 +251,12 @@ class Model {
         this.lModel.insertAfter(newNode, fNode)
         this.lModel.insertAfter(lNode, newNode)
         this.lModel.remove(targetNode)
-        this.hashTable[hashKey(fNode.data.key)] = fNode
-        this.hashTable[hashKey(lNode.data.key)] = lNode
+        this.addToHashTable(fNode.data.key, fNode)
+        this.addToHashTable(lNode.data.key, lNode)
       }
     }
 
-    this.hashTable[hashKey(key)] = newNode
+    this.addToHashTable(key, newNode)
 
     this.broadcast([{type: 'insert', position: position, targetKey: targetKey, str: str, key: key}])
 
@@ -265,7 +264,7 @@ class Model {
   }
 
   splitTwoNode (targetNode, position) {
-    console.log('splitting node in two', this.siteId, targetNode, position)
+    console.log('splitting node in two', 'siteId', this.siteId, 'ssv', this.vectorClock.sum(), targetNode, position)
     let fNode = _.cloneDeep(targetNode)
     fNode.data.key.offset = targetNode.data.key.offset
     fNode.data.key.length = position
@@ -277,6 +276,7 @@ class Model {
     lNode.data.key.length = targetNode.data.key.length - position
 
     console.log(lNode.data.key.length < 0, 'ERROR')
+    if (lNode.data.key.length <= 0) debugger
     lNode.data.str = targetNode.data.str.substr(position, targetNode.data.key.length - fNode.data.key.length)
     log('created lNode', lNode)
 
@@ -346,12 +346,16 @@ class Model {
     }
   }
 
+  addToHashTable (key, node) {
+    if(key.length === 0) debugger
+    this.hashTable[hashKey(key)] = node
+  }
+
   applyRemoteOperations (operations) {
     logOps('before remote operations', this)
 
     operations.forEach(operation => {
       log('remote operation', this.siteId, operation)
-      this.incrementVectorClock(operation.key.site)
       if (operation.type === 'insert') {
         this.remoteInsert(operation.targetKey,
           operation.position,
@@ -366,6 +370,7 @@ class Model {
           operation.key
         )
       }
+      this.incrementVectorClock(operation.key.site)
     })
     logOps('after remote operations', this)
   }
@@ -393,6 +398,8 @@ class Model {
 
       let lastNode = this.hashTable[hashKey(keyList[count - 1].key)]
 
+      if (!lastNode) debugger
+
       this.del(p, lastLength, lastNode)
     }
     return this.lModel
@@ -403,17 +410,18 @@ class Model {
 
     log('del', position, delLength, targetNode)
 
-    if (!targetNode.data.flag) {
-      if (position === 1 && delLength === l) {
-        this.deleteWholeNode(targetNode)
-      } else if (position === 1 && delLength < l) {
-        this.deletePriorNode(targetNode, delLength)
-      } else if (position > 1 && position + delLength - 1 === l) {
-        this.deleteLastNode(targetNode, delLength)
-      } else {
-        this.deleteMiddleNode(targetNode, position, delLength)
-      }
+    // if (!targetNode.data.flag) {
+    if (position === 1 && delLength === l) {
+      this.deleteWholeNode(targetNode)
+    } else if (position === 1 && delLength < l) {
+      this.deletePriorNode(targetNode, delLength)
+    } else if (position > 1 && position + delLength - 1 === l) {
+      this.deleteLastNode(targetNode, delLength)
     } else {
+      this.deleteMiddleNode(targetNode, position, delLength)
+    }
+
+    if (targetNode.data.flag) {
       log('split targetNode', targetNode.data)
       let sub1 = targetNode.data.list[0]
       let sub2 = targetNode.data.list[1]
@@ -422,7 +430,7 @@ class Model {
       let l1 = sub1.data.key.length
       let l2 = sub2.data.key.length
 
-      if (position <= l1 && position + delLength <= l1) {
+      if (position <= l1 && position + delLength - 1 <= l1) {
         this.del(position, delLength, sub1)
       } else if (position <= l1 && delLength - (l1 - position + 1) <= l2) {
         this.del(position, l1 - position + 1, sub1)
@@ -479,8 +487,8 @@ class Model {
         this.lModel.insertAfter(newNode, fNode)
         this.lModel.insertAfter(lNode, newNode)
         this.lModel.remove(targetNode)
-        this.hashTable[hashKey(fNode.data.key)] = fNode
-        this.hashTable[hashKey(lNode.data.key)] = lNode
+        this.addToHashTable(fNode.data.key, fNode)
+        this.addToHashTable(lNode.data.key, lNode)
       }
     } else {
       let previous
@@ -502,7 +510,7 @@ class Model {
       }
     }
 
-    this.hashTable[hashKey(newNode.data.key)] = newNode
+    this.addToHashTable(newNode.data.key, newNode)
     return this.lModel
   }
 }

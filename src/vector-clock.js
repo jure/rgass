@@ -16,7 +16,12 @@ class VectorClock {
   }
 
   sum () {
-    return Object.values(this.clocks).reduce((a, b) => a + b)
+    let clocks = Object.values(this.clocks)
+    if (clocks.length === 0) {
+      return 0
+    } else {
+      return clocks.reduce((a, b) => a + b)
+    }
   }
 }
 
