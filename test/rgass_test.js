@@ -289,6 +289,94 @@ describe('Model', () => {
 
       expect(view.toString()).toEqual('RGbASS')
     })
+
+    it('can correctly sync concurrent mid-node insertions', () => {
+      let remoteModelRemoteOperations = []
+      let localModelRemoteOperations = []
+
+      let remoteModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => {
+          localModel.applyRemoteOperations(operations)
+        }
+      })
+
+      let localModel = new Model({
+        siteId: 2,
+        session: 1,
+        broadcast: (operations) => {
+          remoteModel.applyRemoteOperations(operations)
+        }
+      })
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'Network transmitting normally',
+        cursor: 26,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      remoteModel.broadcast = (operations) => {
+        localModelRemoteOperations = localModelRemoteOperations.concat(operations)
+      }
+
+      localModel.broadcast = (operations) => {
+        remoteModelRemoteOperations = remoteModelRemoteOperations.concat(operations)
+      }
+
+      localModel.applyOperations(generateOps({
+        oldText: 'Network transmitting normally',
+        newText: 'Network transimitting normally',
+        cursor: 14,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'Network transmitting normally',
+        newText: 'Network transmittingg normally',
+        cursor: 21,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      console.log('remote operations to local', localModelRemoteOperations)
+
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+      console.log('remote operations to remote', remoteModelRemoteOperations)
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      expect(remoteNodes).toEqual(localNodes)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('Network transimittingg normally')
+      expect(remoteView.toString()).toEqual('Network transimittingg normally')
+    })
   })
 
   describe('single character deletions', () => {
@@ -738,6 +826,13 @@ describe('Model', () => {
       remoteView.synchronize(remoteModel)
 
       expect(remoteView.toString()).toEqual('')
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      expect(remoteNodes).toEqual(localNodes)
     })
 
     it('regression test - overlapping deletions', () => {
@@ -821,6 +916,200 @@ describe('Model', () => {
 
       expect(localView.toString()).toEqual('w')
       expect(remoteView.toString()).toEqual('w')
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      expect(remoteNodes).toEqual(localNodes)
+    })
+
+    it('regression test - overlapping deletions #2', () => {
+      let remoteModelRemoteOperations = []
+      let localModelRemoteOperations = []
+
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1,
+        broadcast: (operations) => {
+          localModelRemoteOperations = localModelRemoteOperations.concat(operations)
+        }
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => {
+          remoteModelRemoteOperations = remoteModelRemoteOperations.concat(operations)
+        }
+      })
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'transmitting',
+        cursor: 12,
+        model: localModel,
+        view: localView
+      }))
+
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('transmitting')
+      expect(remoteView.toString()).toEqual('transmitting')
+
+      localModel.applyOperations(generateOps({
+        oldText: 'transmitting',
+        newText: 'tra',
+        cursor: 3,
+        model: localModel,
+        view: localView
+      }))
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'transmitting',
+        newText: 'transm',
+        cursor: 6,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('tra')
+      expect(remoteView.toString()).toEqual('tra')
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      expect(remoteNodes).toEqual(localNodes)
+    })
+
+    it('regression test - overlapping insertions and deletions', () => {
+      let remoteModelRemoteOperations = []
+      let localModelRemoteOperations = []
+
+      let remoteModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => {
+          localModel.applyRemoteOperations(operations)
+        }
+      })
+
+      let localModel = new Model({
+        siteId: 2,
+        session: 1,
+        broadcast: (operations) => {
+          remoteModel.applyRemoteOperations(operations)
+        }
+      })
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'Network receiving normally',
+        cursor: 26,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      remoteModel.broadcast = (operations) => {
+        localModelRemoteOperations = localModelRemoteOperations.concat(operations)
+      }
+
+      localModel.broadcast = (operations) => {
+        remoteModelRemoteOperations = remoteModelRemoteOperations.concat(operations)
+      }
+
+      localModel.applyOperations(generateOps({
+        oldText: 'Network receiving normally',
+        newText: 'Network receiiving normally',
+        cursor: 14,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: 'Network receiiving normally',
+        newText: 'Ny',
+        cursor: 1,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'Network receiving normally',
+        newText: 'Network receivingg normally',
+        cursor: 18,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      remoteView.synchronize(remoteModel)
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'Network receivingg normally',
+        newText: 'Ny',
+        cursor: 1,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      remoteView.synchronize(remoteModel)
+
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+      console.log('remote operations to remote', remoteModelRemoteOperations)
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      console.log('remote operations to local', localModelRemoteOperations)
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      expect(remoteNodes).toEqual(localNodes)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('Ny')
+      expect(remoteView.toString()).toEqual('Ny')
     })
   })
 })
