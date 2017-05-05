@@ -469,7 +469,7 @@ class Model {
         }
       } else {
         let fNode, lNode
-        [fNode, lNode] = this.splitTwoNode(targetNode, position)
+        [fNode, lNode] = this.splitTwoNode(targetNode, position - targetNode.data.key.offset)
         this.lModel.insertBefore(fNode, targetNode)
         this.lModel.insertAfter(newNode, fNode)
         this.lModel.insertAfter(lNode, newNode)
