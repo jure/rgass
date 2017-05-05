@@ -91,6 +91,7 @@ class Model {
         targetNode = targetNode.data.list[2]
       }
     }
+
     return targetNode
   }
 
@@ -259,7 +260,6 @@ class Model {
     lNode.data.key.length = targetNode.data.key.length - fNode.data.key.length
 
     console.log(lNode.data.key.length < 0, 'ERROR')
-    if (lNode.data.key.length <= 0) debugger
     lNode.data.str = targetNode.data.str.substr(fNode.data.key.length, targetNode.data.key.length - fNode.data.key.length)
     log('created lNode', lNode)
 
@@ -330,24 +330,23 @@ class Model {
   }
 
   addToHashTable (key, node) {
-    if(key.length === 0) debugger
     this.hashTable[hashKey(key)] = node
   }
 
   applyRemoteOperations (operations) {
-    console.log(operations)
-
     logOps('before remote operations', this)
 
     operations.forEach(operation => {
       log('remote operation', this.siteId, operation)
       if (operation.type === 'insert') {
+        console.log('remoteInsert', operation.targetKey, operation)
         this.remoteInsert(operation.targetKey,
           operation.position,
           operation.str,
           operation.key
         )
       } else {
+        console.log('remoteDelete', operation.keyList, operation)
         this.remoteDelete(
           operation.position,
           operation.delLength,
@@ -356,8 +355,8 @@ class Model {
         )
       }
       this.incrementVectorClock(operation.key.site)
+      logOps('after remote operation ' + operation.type, this)
     })
-    logOps('after remote operations', this)
   }
 
   remoteDelete (position, delLength, keyList, key) {
@@ -381,8 +380,6 @@ class Model {
       let lastLength = delLength - sumLength
 
       let lastNode = this.hashTable[hashKey(keyList[count - 1])]
-
-      if (!lastNode) debugger
 
       this.del(p, lastLength, lastNode)
     }
@@ -441,10 +438,17 @@ class Model {
     }
   }
 
-  remoteInsert (targetKey, position, str, key) {
+  remoteInsert (targetKey, position, str, key, deep) {
     let newNode = new Node({key: key, str: str, visible: 1})
     let targetNode
+
+    // if (deep) {
+    //   console.log('hello2')
     targetNode = this.findNode(targetKey, position)
+    // } else {
+    //   console.log('hello1')
+    //   targetNode = this.hashTable[hashKey(targetKey)]
+    // }
 
     console.log('targetNode', targetNode, 'position', position)
 
