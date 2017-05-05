@@ -61,6 +61,7 @@ class Model {
   }
 
   applyOperations (operations) {
+    console.log(operations)
     logOps('before local operations', this)
 
     operations.forEach(operation => {
@@ -241,10 +242,15 @@ class Model {
   }
 
   splitTwoNode (targetNode, position) {
-    console.log('splitting node in two', 'siteId', this.siteId, 'ssv', this.vectorClock.sum(), targetNode, position)
+    log('splitting node', 'siteId', this.siteId, 'ssv', this.vectorClock.sum(), targetNode, position)
     let fNode = _.cloneDeep(targetNode)
-    fNode.data.key.offset = targetNode.data.key.offset
-    fNode.data.key.length = position - targetNode.data.key.offset
+    // fNode.data.key.offset = targetNode.data.key.offset
+    // if (fNode.data.key.offset > 0) {
+    fNode.data.key.length = position
+    // } else {
+    //   fNode.data.key.length = position
+    // }
+
     fNode.data.str = targetNode.data.str.substr(0, fNode.data.key.length)
     log('created fNode', fNode)
 
@@ -329,6 +335,8 @@ class Model {
   }
 
   applyRemoteOperations (operations) {
+    console.log(operations)
+
     logOps('before remote operations', this)
 
     operations.forEach(operation => {
@@ -388,12 +396,16 @@ class Model {
 
     if (!targetNode.data.flag) {
       if (position === 1 && delLength === l) {
+        log('del', 'deleteWholeNode', targetNode)
         this.deleteWholeNode(targetNode)
       } else if (position === 1 && delLength < l) {
+        log('del', 'deletePriorNode', targetNode, delLength)
         this.deletePriorNode(targetNode, delLength)
       } else if (position > 1 && position + delLength - 1 === l) {
-        this.deleteLastNode(targetNode, position)
+        log('del', 'deleteLastNode', targetNode, position)
+        this.deleteLastNode(targetNode, position - 1)
       } else {
+        log('del', 'deleteMiddleNode', targetNode, position, delLength)
         this.deleteMiddleNode(targetNode, position, delLength)
       }
     } else {
@@ -410,7 +422,7 @@ class Model {
       } else if (position <= l1 && delLength - (l1 - position + 1) <= l2) {
         this.del(position, l1 - position + 1, sub1)
         this.del(1, delLength - (l1 - position + 1), sub2)
-      } else if (position <= l1 && delLength - (l1 - position + 1) >= l2) {
+      } else if (position <= l1 && delLength - (l1 - position + 1) > l2) {
         let p = l1 - position + 1
         this.del(position, p, sub1)
         this.del(1, l2, sub2)
@@ -418,7 +430,7 @@ class Model {
       } else if (position > l1 && position - l1 <= l2 && position - l1 + delLength - 1 <= l2) {
         let p = position - l1
         this.del(p, delLength, sub2)
-      } else if (position > l1 && position - l1 <= l2 && position - l1 + delLength - 1 >= l2) {
+      } else if (position > l1 && position - l1 <= l2 && position - l1 + delLength - 1 > l2) {
         let p = position - l1
         this.del(p, l2 - p + 1, sub2)
         this.del(1, delLength - (l2 - p + 1), sub3)

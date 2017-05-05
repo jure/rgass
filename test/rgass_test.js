@@ -925,6 +925,85 @@ describe('Model', () => {
       expect(remoteNodes).toEqual(localNodes)
     })
 
+    it('regression test - overlapping deletions #2', () => {
+      let remoteModelRemoteOperations = []
+      let localModelRemoteOperations = []
+
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1,
+        broadcast: (operations) => {
+          localModelRemoteOperations = localModelRemoteOperations.concat(operations)
+        }
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => {
+          remoteModelRemoteOperations = remoteModelRemoteOperations.concat(operations)
+        }
+      })
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'transmitting',
+        cursor: 12,
+        model: localModel,
+        view: localView
+      }))
+
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('transmitting')
+      expect(remoteView.toString()).toEqual('transmitting')
+
+      localModel.applyOperations(generateOps({
+        oldText: 'transmitting',
+        newText: 'tra',
+        cursor: 3,
+        model: localModel,
+        view: localView
+      }))
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'transmitting',
+        newText: 'transm',
+        cursor: 6,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      expect(localView.toString()).toEqual('tra')
+      expect(remoteView.toString()).toEqual('tra')
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      expect(remoteNodes).toEqual(localNodes)
+    })
+
     it('regression test - overlapping insertions and deletions', () => {
       let remoteModelRemoteOperations = []
       let localModelRemoteOperations = []
