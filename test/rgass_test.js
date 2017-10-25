@@ -163,6 +163,97 @@ describe('Model', () => {
       remoteView.synchronize(remoteModel)
       expect(remoteView.toString()).toEqual('ABC')
     })
+
+    it('can synchronize with remote sites as described in issue #1', () => {
+      let remoteModelRemoteOperations = []
+      let localModelRemoteOperations = []
+
+      let remoteModel = new Model({
+        siteId: 2,
+        session: 1,
+        broadcast: (operations) => {
+          localModel.applyRemoteOperations(operations)
+        }
+      })
+
+      let localModel = new Model({
+        siteId: 1,
+        session: 1,
+        broadcast: (operations) => {
+          remoteModel.applyRemoteOperations(operations)
+        }
+      })
+
+      let localView = new View()
+      localView.synchronize(localModel)
+
+      let remoteView = new View()
+      remoteView.synchronize(remoteModel)
+
+      localModel.applyOperations(generateOps({
+        oldText: '',
+        newText: 'abcd',
+        cursor: 4,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
+
+      // Disconnect network
+
+      remoteModel.broadcast = (operations) => {
+        localModelRemoteOperations = localModelRemoteOperations.concat(operations)
+      }
+
+      localModel.broadcast = (operations) => {
+        remoteModelRemoteOperations = remoteModelRemoteOperations.concat(operations)
+      }
+
+      localModel.applyOperations(generateOps({
+        oldText: 'abcd',
+        newText: 'aYbcd',
+        cursor: 2,
+        model: localModel,
+        view: localView
+      }))
+
+      localView.synchronize(localModel)
+
+      remoteModel.applyOperations(generateOps({
+        oldText: 'abcd',
+        newText: 'abXcd',
+        cursor: 3,
+        model: remoteModel,
+        view: remoteView
+      }))
+
+      remoteView.synchronize(remoteModel)
+
+      // Reconnect network
+
+      localModel.applyRemoteOperations(localModelRemoteOperations)
+      console.log('remote operations to local', localModelRemoteOperations)
+
+      remoteModel.applyRemoteOperations(remoteModelRemoteOperations)
+      console.log('remote operations to remote', remoteModelRemoteOperations)
+
+      let remoteNodes = []
+      let localNodes = []
+      remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
+      localModel.lModel.traverse(node => localNodes.push(node.data.str))
+
+      console.log(remoteNodes)
+      console.log(localNodes)
+      expect(remoteNodes).toEqual(localNodes)
+
+      localModelRemoteOperations.length = 0
+      remoteModelRemoteOperations.length = 0
+
+      expect(localView.toString()).toEqual('aYbXcd')
+      expect(remoteView.toString()).toEqual('aYbXcd')
+    })
   })
 
   describe('string (multichar) insertions', () => {
