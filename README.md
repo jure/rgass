@@ -7,7 +7,13 @@ A JS implementation of RGASS, a CRDT synchronization algorithm presented in rese
 
 # Getting started
 
-This module is still experimental, but it's easy to play with it already: Clone this repository and run `npm install`, then `npm start` and open at least two browser windows pointing to `localhost:3000`, to test the collaborative text editing.
+This module is still experimental, but it's easy to play with it already:
+1. Clone this repository and
+2. `npm install`, then 
+3. `npm start` 
+4. and open at least two browser windows pointing to `localhost:3000`.
+
+Now you can test its collaborative text editing functionality. There is also a battletest (see below) that will automatically add and delete strings in two text areas concurrently and raise an error if there is a mismatch, as a way to fuzz test the algorithm.
 
 # To run tests
 
@@ -23,6 +29,7 @@ npm run battletest
 
 # TODO
 
+- [ ] Resolve issue with overlapping concurrent insertions and deletions, that the algorihtm described in the paper doesn't address (there is a currently failing test describing the above scenario).
 - [ ] Serialization of Model
 - [ ] Snapshotting (related to above)
 - [ ] More bulletproofing
