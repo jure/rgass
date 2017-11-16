@@ -244,12 +244,13 @@ describe('Model', () => {
       remoteModel.lModel.traverse(node => remoteNodes.push(node.data.str))
       localModel.lModel.traverse(node => localNodes.push(node.data.str))
 
-      console.log(remoteNodes)
-      console.log(localNodes)
       expect(remoteNodes).toEqual(localNodes)
 
       localModelRemoteOperations.length = 0
       remoteModelRemoteOperations.length = 0
+
+      localView.synchronize(localModel)
+      remoteView.synchronize(remoteModel)
 
       expect(localView.toString()).toEqual('aYbXcd')
       expect(remoteView.toString()).toEqual('aYbXcd')
