@@ -1,3 +1,5 @@
+🚨⚠️ No longer in development, for similar use cases (and using the same basic approach) take a look at https://github.com/atom/teletype-crdt. It also passes the edge-case described in the TODO section. ⚠️🚨
+
 # Rgass.js
 
 [![build status](https://gitlab.coko.foundation/jure/rgass/badges/master/build.svg)](https://gitlab.coko.foundation/jure/rgass/commits/master)
